@@ -5,6 +5,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:simple_notes/constants/note_colors.dart";
 import "package:simple_notes/domain/model/note.dart";
 import "package:simple_notes/ui/view_model/note_vm.dart";
+import "package:simple_notes/ui/widgets/note_settings.dart";
 
 @RoutePage()
 class NoteView extends HookConsumerWidget {
@@ -85,20 +86,12 @@ class NoteView extends HookConsumerWidget {
           context: context,
           builder: (BuildContext context) {
             return SafeArea(
-              child: GridView.count(
-                crossAxisCount: 4,
-                children: noteColors
-                    .map(
-                      (e) => InkWell(
-                        onTap: () => vmNotifier.updateColor(e.color),
-                        child: Container(
-                          height: 50,
-                          width: 50,
-                          color: Color(int.parse("0xff${e.color}")),
-                        ),
-                      ),
-                    )
-                    .toList(),
+              child: NoteSettings(
+                tags: const [],
+                reminder: null,
+                expiration: null,
+                onUpdateReminder: (DateTime value) {},
+                onUpdateExpiration: (DateTime value) {},
               ),
             );
           },
@@ -131,8 +124,6 @@ class NoteView extends HookConsumerWidget {
                       hintText: "Название",
                       enabledBorder:
                           const OutlineInputBorder(borderSide: BorderSide.none),
-                      // suffixIcon:
-                      //     Icon(Icons.search, color: Colors.black.withOpacity(0.6)),
                       focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide.none,
                       ),
