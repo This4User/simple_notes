@@ -7,14 +7,20 @@ class NoteDBParams {
   NoteDBParams({
     required this.title,
     required this.text,
+    required this.tags,
     required this.color,
+    required this.remindAt,
+    required this.expireAt,
     this.id,
   });
 
   final String? id;
   final String title;
   final String text;
+  final List<String> tags;
   final String color;
+  final DateTime? remindAt;
+  final DateTime? expireAt;
 }
 
 Future<List<NoteDatabase>> getNotesFromDB() async {
@@ -23,24 +29,29 @@ Future<List<NoteDatabase>> getNotesFromDB() async {
   return assignmentsData;
 }
 
-Future<void> setNoteData(NoteDBParams data) async {
+String setNoteData(NoteDBParams data) {
   const uuid = UuidV8();
 
   final instance = NoteDatabase()
     ..realId = data.id ?? uuid.generate()
     ..title = data.title
     ..text = data.text
+    ..tags = data.tags
     ..color = data.color
+    ..remindAt = data.remindAt
+    ..expireAt = data.expireAt
     ..createdAt = DateTime.now()
     ..updatedAt = DateTime.now();
 
-  await IsarInstance.get.writeTxn(() async {
+  IsarInstance.get.writeTxnSync(() async {
     if (data.id != null) {
-      await IsarInstance.get.notes.putByRealId(instance);
+      IsarInstance.get.notes.putByRealIdSync(instance);
 
       return;
     }
 
     instance.id = await IsarInstance.get.notes.put(instance);
   });
+
+  return instance.realId;
 }

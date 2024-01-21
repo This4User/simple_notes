@@ -10,7 +10,10 @@ class NoteDatabase {
   late String realId;
   late String title;
   late String text;
+  late List<String> tags;
   late String color;
+  late DateTime? remindAt;
+  late DateTime? expireAt;
   late DateTime createdAt;
   late DateTime updatedAt;
 }

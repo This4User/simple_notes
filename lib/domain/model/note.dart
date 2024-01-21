@@ -8,6 +8,9 @@ class Note with _$Note {
     required String id,
     required String title,
     required String text,
+    required List<String> tags,
+    required DateTime? remindAt,
+    required DateTime? expireAt,
     @Default("FBF8CC") String color,
   }) = _Note;
 }

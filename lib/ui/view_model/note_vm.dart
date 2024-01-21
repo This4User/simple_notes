@@ -13,6 +13,9 @@ class NoteModel with _$NoteModel {
     String? id,
     @Default("") String title,
     @Default("") String text,
+    @Default([]) List<String> tags,
+    @Default(null) DateTime? remindAt,
+    @Default(null) DateTime? expireAt,
     @Default("FBF8CC") String color,
   }) = _NoteModel;
 }
@@ -29,17 +32,27 @@ class NoteVm extends _$NoteVm {
       id: data.id,
       title: data.title,
       text: data.text,
+      tags: data.tags,
       color: data.color,
+      remindAt: data.remindAt,
+      expireAt: data.expireAt,
     );
   }
 
-  Future<void> saveNote() async {
-    await setNoteData(
-      NoteDBParams(
-        id: state.id,
-        title: state.title,
-        text: state.text,
-        color: state.color,
+  void saveNote() {
+    if (state.text.isEmpty) return;
+
+    state = state.copyWith(
+      id: setNoteData(
+        NoteDBParams(
+          id: state.id,
+          title: state.title,
+          text: state.text,
+          tags: state.tags,
+          color: state.color,
+          remindAt: state.remindAt,
+          expireAt: state.expireAt,
+        ),
       ),
     );
   }
@@ -54,5 +67,17 @@ class NoteVm extends _$NoteVm {
 
   void updateColor(String value) {
     state = state.copyWith(color: value);
+  }
+
+  void updateRemindAt(DateTime value) {
+    state = state.copyWith(remindAt: value);
+  }
+
+  void updateExpireAt(DateTime value) {
+    state = state.copyWith(expireAt: value);
+  }
+
+  void updateTags(List<String> value) {
+    state = state.copyWith(tags: value);
   }
 }

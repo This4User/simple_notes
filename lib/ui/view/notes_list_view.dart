@@ -15,8 +15,9 @@ class NotesListView extends HookConsumerWidget {
     final vmNotifier = ref.read(notesVmProvider.notifier);
 
     return Scaffold(
+      backgroundColor: const Color(0xff49494A),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xffF3F5F9),
         onPressed: () => context.router.push(
           NoteRoute(),
         ),
@@ -26,12 +27,14 @@ class NotesListView extends HookConsumerWidget {
         ),
       ),
       appBar: AppBar(
+        backgroundColor: const Color(0xff49494A),
         title: const Row(
           children: [
             Text(
               "Привет :)",
               style: TextStyle(
                 fontWeight: FontWeight.w600,
+                color: Color(0xffF3F5F9),
               ),
               textAlign: TextAlign.start,
             ),

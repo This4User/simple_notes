@@ -37,7 +37,10 @@ class NotesVm extends _$NotesVm {
               id: e.realId,
               title: e.title,
               text: e.text,
+              tags: e.tags,
               color: e.color,
+              expireAt: e.remindAt,
+              remindAt: e.expireAt,
             ),
           )
           .toList(),
