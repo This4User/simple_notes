@@ -43,9 +43,9 @@ String setNoteData(NoteDBParams data) {
     ..createdAt = DateTime.now()
     ..updatedAt = DateTime.now();
 
-  IsarInstance.get.writeTxnSync(() async {
+  IsarInstance.get.writeTxn(() async {
     if (data.id != null) {
-      IsarInstance.get.notes.putByRealIdSync(instance);
+      await IsarInstance.get.notes.putByRealId(instance);
 
       return;
     }

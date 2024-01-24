@@ -34,6 +34,7 @@ class NoteSettings extends HookWidget {
     required this.expiration,
     required this.onUpdateExpiration,
     required this.onUpdateTags,
+    required this.onDelete,
     super.key,
   });
 
@@ -48,6 +49,7 @@ class NoteSettings extends HookWidget {
   final void Function(DateTime date) onUpdateExpiration;
 
   final void Function(List<String> value) onUpdateTags;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +149,11 @@ class NoteSettings extends HookWidget {
                                   padding: const EdgeInsets.only(left: 15),
                                   child: TextField(
                                     controller: tagTextController,
+                                    onTapOutside: (_) {
+                                      if (tagTextController.text.isEmpty) {
+                                        isTagFieldOpened.value = false;
+                                      }
+                                    },
                                     maxLength: 20,
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
@@ -238,12 +245,81 @@ class NoteSettings extends HookWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: SettingsDatePicker(
-            title: expirationDate.value ?? "Установить срок жизни -->",
-            onUpdate: (DateTime value) {
-              expirationDate.value = value.toString();
-              onUpdateExpiration(value);
-            },
+          child: Ink(
+            decoration: const BoxDecoration(
+              color: Color(0xffD2D6EF),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15),
+              child: TextField(
+                controller: tagTextController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: "Установить срок жизни",
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                ),
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent.withOpacity(0.7),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  ),
+                  child: InkWell(
+                    onTap: onDelete,
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    child: const Padding(
+                      padding: EdgeInsets.all(15),
+                      child: Text(
+                        "Удалить",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Ink(
+              //   decoration: BoxDecoration(
+              //     color: Colors.greenAccent.withOpacity(0.7),
+              //     borderRadius: const BorderRadius.all(Radius.circular(20)),
+              //   ),
+              //   child: InkWell(
+              //     onTap: onDelete,
+              //     borderRadius: const BorderRadius.all(Radius.circular(20)),
+              //     child: const Padding(
+              //       padding: EdgeInsets.all(15),
+              //       child: Text(
+              //         "Сохранить в pdf",
+              //         style: TextStyle(
+              //           fontSize: 18,
+              //           color: Colors.black,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ],
           ),
         ),
       ],

@@ -1,7 +1,9 @@
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
+import "package:simple_notes/api/notes.dart";
 import "package:simple_notes/domain/database/notes.dart";
 import "package:simple_notes/domain/model/note.dart";
+import "package:simple_notes/domain/notifications/instance.dart";
 
 part "note_vm.freezed.dart";
 
@@ -11,6 +13,7 @@ part "note_vm.g.dart";
 class NoteModel with _$NoteModel {
   const factory NoteModel({
     String? id,
+    @Default(true) bool isNew,
     @Default("") String title,
     @Default("") String text,
     @Default([]) List<String> tags,
@@ -30,17 +33,43 @@ class NoteVm extends _$NoteVm {
   void initNote(Note data) {
     state = state.copyWith(
       id: data.id,
+      isNew: data.isNew,
       title: data.title,
       text: data.text,
       tags: data.tags,
       color: data.color,
-      remindAt: data.remindAt,
-      expireAt: data.expireAt,
+      remindAt: data.reminder,
+      expireAt: data.expires,
     );
+  }
+
+  Future<void> syncNote() async {
+    if (state.text.isNotEmpty) {
+      await (state.isNew ? sendCreateNote : sendUpdateNote)(
+        NoteDto(
+          id: state.id ?? "",
+          title: state.title,
+          text: state.text,
+          tags: state.tags,
+          reminder: state.remindAt?.toIso8601String(),
+          expires: null,
+          color: state.color,
+        ),
+      );
+
+      saveNote();
+    }
   }
 
   void saveNote() {
     if (state.text.isEmpty) return;
+
+    if (state.remindAt != null && state.remindAt!.isAfter(DateTime.now())) {
+      NotificationsInstance.scheduleNotification(
+        body: state.title,
+        dateString: state.remindAt!.toIso8601String(),
+      );
+    }
 
     state = state.copyWith(
       id: setNoteData(
@@ -79,5 +108,11 @@ class NoteVm extends _$NoteVm {
 
   void updateTags(List<String> value) {
     state = state.copyWith(tags: value);
+  }
+
+  Future<void> delete() async {
+    if (state.isNew) return;
+
+    await sendDeleteNote(state.id);
   }
 }

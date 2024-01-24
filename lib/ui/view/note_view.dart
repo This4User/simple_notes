@@ -41,7 +41,7 @@ class NoteView extends HookConsumerWidget {
           });
         }
 
-        return null;
+        return vmNotifier.syncNote;
       },
       [],
     );
@@ -87,35 +87,7 @@ class NoteView extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: color,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () => showModalBottomSheet<void>(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-          ),
-          useSafeArea: true,
-          context: context,
-          builder: (BuildContext context) {
-            return SafeArea(
-              child: NoteSettings(
-                color: color,
-                contrastingColor: contrastingColor,
-                tags: vm.tags,
-                reminder: vm.remindAt?.toString(),
-                expiration: vm.expireAt?.toString(),
-                onUpdateReminder: vmNotifier.updateRemindAt,
-                onUpdateExpiration: vmNotifier.updateExpireAt,
-                onUpdateTags: vmNotifier.updateTags,
-              ),
-            );
-          },
-        ),
-        child: Icon(
-          Icons.star,
-          size: 40,
-          color: color,
-        ),
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       body: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -175,7 +147,7 @@ class NoteView extends HookConsumerWidget {
                         );
                       },
                     ),
-                    child: ColoredBox(
+                    child: Ink(
                       color: contrastingColor.withOpacity(0.7),
                       child: Padding(
                         padding: const EdgeInsets.all(8),
@@ -190,35 +162,75 @@ class NoteView extends HookConsumerWidget {
                     ),
                   ),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: textController,
-                    onChanged: vmNotifier.updateText,
-                    maxLines: null,
-                    keyboardType: TextInputType.multiline,
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: contrastingColor,
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: InkWell(
+                    onTap: () => showModalBottomSheet<void>(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      useSafeArea: true,
+                      context: context,
+                      builder: (BuildContext context) {
+                        return SafeArea(
+                          child: NoteSettings(
+                            color: color,
+                            contrastingColor: contrastingColor,
+                            tags: vm.tags,
+                            reminder: vm.remindAt?.toString(),
+                            expiration: vm.expireAt?.toString(),
+                            onUpdateReminder: vmNotifier.updateRemindAt,
+                            onUpdateExpiration: vmNotifier.updateExpireAt,
+                            onUpdateTags: vmNotifier.updateTags,
+                            onDelete: vmNotifier.delete,
+                          ),
+                        );
+                      },
                     ),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      filled: true,
-                      fillColor: color,
-                      hintStyle: const TextStyle(fontSize: 24),
-                      hintText: "Текст заметки",
-                      enabledBorder:
-                          const OutlineInputBorder(borderSide: BorderSide.none),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide.none,
+                    child: Ink(
+                      color: contrastingColor.withOpacity(0.7),
+                      child: Icon(
+                        Icons.settings,
+                        size: 41,
+                        color: color,
                       ),
                     ),
                   ),
                 ),
               ],
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: textController,
+                        onChanged: vmNotifier.updateText,
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: contrastingColor,
+                          height: 1.25,
+                        ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          filled: true,
+                          fillColor: color,
+                          hintStyle: const TextStyle(fontSize: 24),
+                          hintText: "Текст заметки",
+                          enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide.none),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

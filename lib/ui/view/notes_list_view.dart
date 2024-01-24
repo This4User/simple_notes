@@ -1,5 +1,6 @@
 import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:simple_notes/ui/router/config.dart";
 import "package:simple_notes/ui/view_model/notes_vm.dart";
@@ -14,24 +15,35 @@ class NotesListView extends HookConsumerWidget {
     final vm = ref.watch(notesVmProvider);
     final vmNotifier = ref.read(notesVmProvider.notifier);
 
+    useEffect(
+      () {
+        Future(vmNotifier.init);
+
+        return null;
+      },
+      [],
+    );
+
     return Scaffold(
       backgroundColor: const Color(0xff49494A),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xffF3F5F9),
-        onPressed: () => context.router.push(
-          NoteRoute(),
-        ),
-        child: const Icon(
-          Icons.add_circle_outline,
-          size: 40,
-        ),
-      ),
+      floatingActionButton: vm.items.isNotEmpty
+          ? FloatingActionButton(
+              backgroundColor: const Color(0xffF3F5F9),
+              onPressed: () => context.router.push(
+                NoteRoute(),
+              ),
+              child: const Icon(
+                Icons.add_circle_outline,
+                size: 40,
+              ),
+            )
+          : null,
       appBar: AppBar(
         backgroundColor: const Color(0xff49494A),
         title: const Row(
           children: [
             Text(
-              "Привет :)",
+              "ColorNotes",
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: Color(0xffF3F5F9),
@@ -40,6 +52,31 @@ class NotesListView extends HookConsumerWidget {
             ),
           ],
         ),
+        actions: [
+          if (vm.items.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: InkWell(
+                onTap: () {},
+                child: const Icon(
+                  Icons.download,
+                  size: 41,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: InkWell(
+              onTap: () {},
+              child: const Icon(
+                Icons.sync,
+                size: 41,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: vm.items.isNotEmpty
