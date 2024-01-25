@@ -13,25 +13,31 @@ Future<NoteDto?> sendCreateNote(NoteDto data) async {
 }
 
 Future<NoteDto?> sendUpdateNote(NoteDto data) async {
-  final response = await dio.put<Map<String, dynamic>>(
-    "/update",
-    data: data.toJson(),
-  );
+  try {
+    final response = await dio.put<Map<String, dynamic>>(
+      "/update",
+      data: data.toJson(),
+    );
 
-  if (response.data == null) return null;
+    if (response.data == null) return null;
 
-  return NoteDto.fromJson(response.data!);
+    return NoteDto.fromJson(response.data!);
+  } catch (_) {
+    return null;
+  }
 }
 
 Future<void> sendDeleteNote(String? id) async {
   if (id == null) return;
 
-  await dio.delete<void>(
-    "/delete",
-    data: {
-      "id": id,
-    },
-  );
+  try {
+    await dio.delete<void>(
+      "/delete",
+      data: {
+        "id": id,
+      },
+    );
+  } catch (_) {}
 }
 
 Future<List<NoteDto>> sendGetAllNotes() async {

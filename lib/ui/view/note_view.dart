@@ -36,21 +36,19 @@ class NoteView extends HookConsumerWidget {
     useEffect(
       () {
         if (data != null) {
-          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          Future(() {
             vmNotifier.initNote(data!);
           });
         }
 
-        return vmNotifier.syncNote;
+        return null;
       },
       [],
     );
 
     useEffect(
       () {
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          vmNotifier.saveNote();
-        });
+        Future(vmNotifier.saveNote);
 
         return null;
       },
@@ -171,18 +169,21 @@ class NoteView extends HookConsumerWidget {
                       ),
                       useSafeArea: true,
                       context: context,
-                      builder: (BuildContext context) {
+                      builder: (BuildContext builderContext) {
                         return SafeArea(
                           child: NoteSettings(
                             color: color,
                             contrastingColor: contrastingColor,
                             tags: vm.tags,
                             reminder: vm.remindAt?.toString(),
-                            expiration: vm.expireAt?.toString(),
+                            expiration: vm.expiresIn,
                             onUpdateReminder: vmNotifier.updateRemindAt,
                             onUpdateExpiration: vmNotifier.updateExpireAt,
                             onUpdateTags: vmNotifier.updateTags,
-                            onDelete: vmNotifier.delete,
+                            onDelete: () {
+                              vmNotifier.delete();
+                              context.router.popUntilRoot();
+                            },
                           ),
                         );
                       },

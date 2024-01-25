@@ -1,7 +1,11 @@
+import "dart:async";
+
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
+import "package:simple_notes/api/notes.dart";
 import "package:simple_notes/domain/collection/note.dart";
 import "package:simple_notes/domain/database/instance.dart";
+import "package:simple_notes/domain/database/notes.dart";
 import "package:simple_notes/domain/model/note.dart";
 import "package:simple_notes/domain/notifications/instance.dart";
 import "package:simple_notes/domain/repository/notes.dart";
@@ -26,10 +30,11 @@ class NotesVm extends _$NotesVm {
     return const NotesModel();
   }
 
-  Future<void> init() async {
+  Future<void> init({bool isNeedUpdate = false}) async {
     if (!state.isInitialized) _initListenLocalChanges();
 
-    final notes = (await getAllNotes()).reversed.toList();
+    final notes =
+        (await getAllNotes(isNeedUpdate: isNeedUpdate)).reversed.toList();
 
     await _setNotifications(notes);
 
@@ -56,6 +61,34 @@ class NotesVm extends _$NotesVm {
         );
       }
     }
+  }
+
+  Future<void> sync() async {
+    final notes = await getNotesFromDB();
+    var count = 0;
+    final completer = Completer<void>();
+
+    if (count == notes.length) completer.complete();
+
+    for (final note in notes) {
+      await (note.isNeedSendCreate ? sendCreateNote : sendUpdateNote)(
+        NoteDto(
+          id: note.realId,
+          title: note.title,
+          text: note.text,
+          tags: note.tags,
+          reminder: note.remindAt?.toIso8601String(),
+          expires: note.expiresIn,
+          color: note.color,
+        ),
+      );
+      count++;
+
+      if (count == notes.length) completer.complete();
+    }
+
+    await completer.future;
+    await init(isNeedUpdate: true);
   }
 
   Note getById(String id) {

@@ -68,7 +68,7 @@ class NotesListView extends HookConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(right: 10),
             child: InkWell(
-              onTap: () {},
+              onTap: vmNotifier.sync,
               child: const Icon(
                 Icons.sync,
                 size: 41,

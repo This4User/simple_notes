@@ -13,7 +13,8 @@ class NoteDatabase {
   late List<String> tags;
   late String color;
   late DateTime? remindAt;
-  late DateTime? expireAt;
+  late int? expiresIn;
   late DateTime createdAt;
   late DateTime updatedAt;
+  late bool isNeedSendCreate;
 }

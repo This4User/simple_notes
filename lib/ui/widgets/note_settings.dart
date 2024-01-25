@@ -45,8 +45,8 @@ class NoteSettings extends HookWidget {
   final String? reminder;
   final void Function(DateTime date) onUpdateReminder;
 
-  final String? expiration;
-  final void Function(DateTime date) onUpdateExpiration;
+  final int? expiration;
+  final void Function(int value) onUpdateExpiration;
 
   final void Function(List<String> value) onUpdateTags;
   final VoidCallback onDelete;
@@ -54,7 +54,7 @@ class NoteSettings extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final reminderDate = useState<String?>(reminder);
-    final expirationDate = useState<String?>(expiration);
+    final expirationDate = useState<int?>(expiration);
     final isTagFieldOpened = useState<bool>(false);
     final tagTextController = useTextEditingController();
 

@@ -10,7 +10,8 @@ class NoteDBParams {
     required this.tags,
     required this.color,
     required this.remindAt,
-    required this.expireAt,
+    required this.expireIn,
+    this.isNeedCreate = true,
     this.id,
   });
 
@@ -20,13 +21,26 @@ class NoteDBParams {
   final List<String> tags;
   final String color;
   final DateTime? remindAt;
-  final DateTime? expireAt;
+  final int? expireIn;
+  final bool isNeedCreate;
 }
 
 Future<List<NoteDatabase>> getNotesFromDB() async {
   final assignmentsData = await IsarInstance.get.notes.where().findAll();
 
   return assignmentsData;
+}
+
+Future<void> clearNotesDB() async {
+  await IsarInstance.get.writeTxn(() async {
+    await IsarInstance.get.notes.clear();
+  });
+}
+
+Future<void> deleteNoteFromDB(String id) async {
+  await IsarInstance.get.writeTxn(() async {
+    await IsarInstance.get.notes.deleteByRealId(id);
+  });
 }
 
 String setNoteData(NoteDBParams data) {
@@ -39,9 +53,10 @@ String setNoteData(NoteDBParams data) {
     ..tags = data.tags
     ..color = data.color
     ..remindAt = data.remindAt
-    ..expireAt = data.expireAt
+    ..expiresIn = data.expireIn
     ..createdAt = DateTime.now()
-    ..updatedAt = DateTime.now();
+    ..updatedAt = DateTime.now()
+    ..isNeedSendCreate = data.isNeedCreate;
 
   IsarInstance.get.writeTxn(() async {
     if (data.id != null) {

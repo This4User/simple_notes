@@ -20,7 +20,7 @@ Future<List<Note>> getAllNotes({bool isNeedUpdate = false}) async {
           tags: e.tags,
           color: e.color,
           reminder: e.remindAt,
-          expires: e.expireAt,
+          expires: e.expiresIn,
         ),
       )
       .toList();
@@ -28,6 +28,8 @@ Future<List<Note>> getAllNotes({bool isNeedUpdate = false}) async {
 
 Future<List<Note>> _syncNotes() async {
   final apiNotesData = await sendGetAllNotes();
+
+  await clearNotesDB();
 
   for (final e in apiNotesData) {
     setNoteData(
@@ -38,7 +40,8 @@ Future<List<Note>> _syncNotes() async {
         tags: e.tags,
         color: e.color,
         remindAt: parseDateOrNull(e.reminder),
-        expireAt: parseDateOrNull(e.expires),
+        expireIn: e.expires,
+        isNeedCreate: false,
       ),
     );
   }
@@ -53,8 +56,15 @@ Future<List<Note>> _syncNotes() async {
           tags: e.tags,
           color: e.color,
           reminder: parseDateOrNull(e.reminder),
-          expires: parseDateOrNull(e.expires),
+          expires: e.expires,
         ),
       )
       .toList();
+}
+
+Future<void> deleteNote(String? id) async {
+  if (id == null) return;
+
+  await deleteNoteFromDB(id);
+  await sendDeleteNote(id);
 }

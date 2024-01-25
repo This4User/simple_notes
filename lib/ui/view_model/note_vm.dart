@@ -1,9 +1,9 @@
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
-import "package:simple_notes/api/notes.dart";
 import "package:simple_notes/domain/database/notes.dart";
 import "package:simple_notes/domain/model/note.dart";
 import "package:simple_notes/domain/notifications/instance.dart";
+import "package:simple_notes/domain/repository/notes.dart";
 
 part "note_vm.freezed.dart";
 
@@ -18,7 +18,7 @@ class NoteModel with _$NoteModel {
     @Default("") String text,
     @Default([]) List<String> tags,
     @Default(null) DateTime? remindAt,
-    @Default(null) DateTime? expireAt,
+    @Default(null) int? expiresIn,
     @Default("FBF8CC") String color,
   }) = _NoteModel;
 }
@@ -39,26 +39,8 @@ class NoteVm extends _$NoteVm {
       tags: data.tags,
       color: data.color,
       remindAt: data.reminder,
-      expireAt: data.expires,
+      expiresIn: data.expires,
     );
-  }
-
-  Future<void> syncNote() async {
-    if (state.text.isNotEmpty) {
-      await (state.isNew ? sendCreateNote : sendUpdateNote)(
-        NoteDto(
-          id: state.id ?? "",
-          title: state.title,
-          text: state.text,
-          tags: state.tags,
-          reminder: state.remindAt?.toIso8601String(),
-          expires: null,
-          color: state.color,
-        ),
-      );
-
-      saveNote();
-    }
   }
 
   void saveNote() {
@@ -80,7 +62,7 @@ class NoteVm extends _$NoteVm {
           tags: state.tags,
           color: state.color,
           remindAt: state.remindAt,
-          expireAt: state.expireAt,
+          expireIn: state.expiresIn,
         ),
       ),
     );
@@ -102,8 +84,8 @@ class NoteVm extends _$NoteVm {
     state = state.copyWith(remindAt: value);
   }
 
-  void updateExpireAt(DateTime value) {
-    state = state.copyWith(expireAt: value);
+  void updateExpireAt(int value) {
+    state = state.copyWith(expiresIn: value);
   }
 
   void updateTags(List<String> value) {
@@ -113,6 +95,6 @@ class NoteVm extends _$NoteVm {
   Future<void> delete() async {
     if (state.isNew) return;
 
-    await sendDeleteNote(state.id);
+    await deleteNote(state.id);
   }
 }

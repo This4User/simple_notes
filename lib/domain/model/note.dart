@@ -12,7 +12,7 @@ class Note with _$Note {
     required String text,
     required List<String> tags,
     required DateTime? reminder,
-    required DateTime? expires,
+    required int? expires,
     required bool isNew,
     @Default("FBF8CC") String color,
   }) = _Note;
@@ -26,7 +26,7 @@ class NoteDto with _$NoteDto {
     required String text,
     required List<String> tags,
     required String? reminder,
-    required String? expires,
+    required int? expires,
     @Default("FBF8CC") String color,
   }) = _NoteDto;
 
