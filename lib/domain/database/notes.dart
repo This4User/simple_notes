@@ -60,6 +60,12 @@ String setNoteData(NoteDBParams data) {
 
   IsarInstance.get.writeTxn(() async {
     if (data.id != null) {
+      final prevIsNeedSendCreate =
+          (await IsarInstance.get.notes.getByRealId(data.id!))
+              ?.isNeedSendCreate;
+
+      instance.isNeedSendCreate = prevIsNeedSendCreate ?? data.isNeedCreate;
+
       await IsarInstance.get.notes.putByRealId(instance);
 
       return;
